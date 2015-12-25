@@ -1,20 +1,36 @@
 package basicCameraGUI;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class controller implements PropertyChangeListener, Controller  {
-	private model MODEL;
-	private view VIEW;
+public class Controller implements PropertyChangeListener  {
+	private FractalDisplayModel MODEL;
+	private View VIEW;
+	
 
 	
-	public controller(view view_, model model_){
+	public Controller(View view_, FractalDisplayModel model_){
         this.VIEW = view_;
         this.MODEL = model_;
 
         //register the controller as the listener of the model
         this.MODEL.addListener(this);
+        //this.MODEL.getImage();
 
-        setUpViewEvents();
+        //setUpViewEvents();
     }
+	public void setViewPicture(){
+		
+	}
+	
+	public void setX(){
+		
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

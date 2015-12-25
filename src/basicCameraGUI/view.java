@@ -2,9 +2,9 @@ package basicCameraGUI;
 
 import javax.swing.*;
 
-interface view {
-	JFrame initialize();
-	JLabel visualize();
-	
+public interface View {
+	public abstract JLabel visualField();
+	public abstract JPanel controlPanel();
+	public abstract void close();
 
 }
