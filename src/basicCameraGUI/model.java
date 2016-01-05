@@ -2,6 +2,8 @@ package basicCameraGUI;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.event.ChangeListener;
+
 interface Model {
 	abstract void setX1(double x1_);
 	abstract void setY1(double y1_);

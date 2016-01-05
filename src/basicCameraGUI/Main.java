@@ -21,7 +21,7 @@ public class Main{
         Model model = new FractalDisplayModel();
         View view = new StandardView();
         Controller controller = new Controller(view,model);
-        
+        controller.setUI(StandardView.UI_CLASS_ID, "StandardViewUI");
         JFrame frame = new JFrame();
         
         

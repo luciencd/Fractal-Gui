@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 public class FractalDisplayModel implements Model{
@@ -33,7 +34,7 @@ public class FractalDisplayModel implements Model{
 	
 	
 	public FractalDisplayModel(){
-		this(-2.0,1.0,-1.0,1.0);
+		this(0.5,1.0,0.0,1.0);
 	}
 	
 	public FractalDisplayModel(double x1_,double x2_,double y1_,double y2_){
@@ -122,6 +123,14 @@ public class FractalDisplayModel implements Model{
     public BufferedImage getImage(){
     	return image;
     }
+    
+    public void removeChangeListener(Controller c){
+    	
+    }
+    public void addChangeListener(Controller c){
+    	
+    }
+    
 	/**
 	 * 
 	 * @param width
