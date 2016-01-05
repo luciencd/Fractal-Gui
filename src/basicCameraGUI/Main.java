@@ -1,8 +1,12 @@
 package basicCameraGUI;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
@@ -13,26 +17,26 @@ import javax.swing.JTextField;
  */
 public class Main{
     public static void main(String[] args){
-        View view = new StandardView();
-        FractalDisplayModel model = new FractalDisplayModel();
+    	
+        JComponent model = new FractalDisplayModel();
+        System.out.println("start");
+        JFrame frame = new JFrame();
+        
 
-
-        //create jframe
-        JFrame frame = new JFrame("Fractal");
+        frame.add(model);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(view.controlPanel());
-        frame.add(view.visualField());
-        JTextField p = new JTextField("ass");
         
-        //frame.add(p);
-
-        //make sure the view and model is fully initialized before letting the controller control them.
-        Controller controller = new Controller(view, model);
+        //frame.add(panel);
+        
+ 
+        
 
 
         frame.setVisible(true);
-        frame.setSize(new Dimension(300,300));
+        frame.setSize(new Dimension(500,500));
+
+        System.out.println("final");
         
 
     }

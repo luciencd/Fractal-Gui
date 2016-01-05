@@ -1,27 +1,53 @@
 package basicCameraGUI;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.JobAttributes;
+import java.awt.PageAttributes;
+import java.awt.PrintJob;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.event.SwingPropertyChangeSupport;
 
-public class FractalDisplayModel extends java.util.Observable {
-	private double x;
-	private double y;
-	private double width;
-	private double height;
-	private double zoom;
-	private double resolution;
+public class FractalDisplayModel extends JComponent {
+	private double x1;
+	private double y1;
+	private double x2;
+	private double y2;
 	
+	
+	private BufferedImage image;
+	
+	private int width = 500; 
+	private int height = 500;
+	private double resolution = 500;
 	private ComplexNumber z;
 	private SwingPropertyChangeSupport propChangeFirer;
 	
+	
+	public FractalDisplayModel(){
+		this(-2.0,1.0,-1.0,1.0);
+	}
+	
+	public FractalDisplayModel(double x1_,double x2_,double y1_,double y2_){
+		x1=x1_;
+		x2=x2_;
+		y1=y1_;
+		y2=y2_;
+		
+		//propChangeFirer = new SwingPropertyChangeSupport(this);
+		image = computeImage();
+		System.out.println("image constructor2");
+	}
 
-	public FractalDisplayModel() {
-        propChangeFirer = new SwingPropertyChangeSupport(this);
-    }
+
     public void addListener(PropertyChangeListener prop) {
         propChangeFirer.addPropertyChangeListener(prop);
     }
@@ -32,10 +58,8 @@ public class FractalDisplayModel extends java.util.Observable {
      * @modifies x
      * @effects changes x to x_
      */
-    public void setX(double x_){
-    	x = x_;
-    	setChanged();
-    	notifyObservers();
+    public void setX1(double x1_){
+    	x1 = x1_;
     }
     /**
      * Sets the value of y to y_
@@ -43,47 +67,32 @@ public class FractalDisplayModel extends java.util.Observable {
      * @modifies x
      * @effects changes x to x_
      */
-    public void setY(double y_){
-    	y = y_;
-    	setChanged();
-    	notifyObservers();
+    public void setY1(double y1_){
+    	y1 = y1_;
     }
     
-    /**
-     * Sets the value of width to width_
-     * @param width_
-     * @modifies width_
-     * @effects changes width to width_
-     */
-    public void setWidth(double width_){
-    	width = width_;
-    	setChanged();
-    	notifyObservers();
-    }
     
     /**
-     * Sets the value of width to width_
-     * @param width_
-     * @modifies width_
-     * @effects changes width to width_
+     * Sets the value of x to x_
+     * @param x_
+     * @modifies x
+     * @effects changes x to x_
      */
-    public void setHeight(double height_){
-    	height = height_;
-    	setChanged();
-    	notifyObservers();
+    public void setX2(double x2_){
+    	x2 = x2_;
+    }
+    /**
+     * Sets the value of y to y_
+     * @param x_
+     * @modifies x
+     * @effects changes x to x_
+     */
+    public void setY2(double y2_){
+    	y2 = y2_;
     }
     
-    /**
-     * Sets the value of zoom to zoom_
-     * @param zoom_
-     * @modifies zoom_
-     * @effects changes zoom to zoom_
-     */
-    public void setZoom(double zoom_){
-    	zoom = zoom_;
-    	setChanged();
-    	notifyObservers();
-    }
+    
+    
     /**
      * Sets the value of resolution to resolution_
      * @param resolution_
@@ -92,50 +101,61 @@ public class FractalDisplayModel extends java.util.Observable {
      */
     public void setResolution(double resolution_){
     	resolution = resolution_;
-    	setChanged();
-    	notifyObservers();
     }
     
     
+    public void paintComponent(Graphics g){
+    	System.out.println("p: "+getWidth()+" "+getHeight());
+    	g.drawImage(image,0,0,getWidth(),getHeight(),this);
+    }
+    
+    
+    public int getWidth(){
+    	return width;
+    }
+    
+    public int getHeight(){
+    	return width;
+    }
 	/**
 	 * 
 	 * @param width
 	 * @param height
 	 * @return
 	 */
-	public BufferedImage getImage(){
+	public BufferedImage computeImage(){
 		//x1, x2
 		//i1, i2 actual position of 4 corners in complex plane.
-		BufferedImage img = new BufferedImage((int)width, (int)height,BufferedImage.TYPE_BYTE_GRAY);
-		ComplexNumber center = new ComplexNumber(x,y);
+		BufferedImage img = new BufferedImage((int)getWidth(), (int)getHeight(),BufferedImage.TYPE_BYTE_GRAY);
+		//ComplexNumber center = new ComplexNumber(x,y);
 		
 		int max = 255;
-		/*for(double i = x-width*zoom; i<x+width*zoom; i+=i*zoom*resolution){
-			
-			for(double j = y-height*zoom; j<y+height*zoom; j+=j*zoom*resolution){
-				
-				int imgWidth = (int)(i*(1/zoom));
-				int imgHeight = (int)(j*(1/zoom));
-				
-				
-				
-			}
-		}*/
+
 		Graphics g = img.getGraphics();
-		g.drawImage(img, 0, 0, null);
+
+		double stepx = (x2-x1)/resolution;
+		double stepy = (y2-y1)/resolution;
 		
-		for(int i = 0; i<width; i++){
-			for(int j = 0;j<height;j++){
-				double x0 = x - zoom/2 + zoom*(i/width);
-				double y0 = y - zoom/2 + zoom*(j/height);
-				ComplexNumber z0 = new ComplexNumber(x0,y0);
+		int x = 0;
+		int y = 0;
+		for(double i = x1; i<x2+(getWidth()/resolution); i+=stepx){
+			x+=width/resolution;
+			y = 0;
+			for(double j = y1; j<y2+(getHeight()/resolution);j+=stepy){
+				y+=height/resolution;
+				ComplexNumber z0 = new ComplexNumber(i,j);
 				int gray = max - mand(z0,max);
-				Color color = new Color(gray, gray, gray);
+				
+				Color color;
+				
+				color = new Color(gray, gray, gray);
+				
+				
 				g.setColor(color);
-				g.drawLine(i,j,i,j);
+				g.drawLine(x,y,x,y);
 			}
+			
 		}
-		
 		return img;
 		
 	}
@@ -148,11 +168,20 @@ public class FractalDisplayModel extends java.util.Observable {
 	 */
 	public static int mand(ComplexNumber z0,int max){
 		ComplexNumber z = z0;
-		for(int t = 0; t<max; t++){
-			if(Math.pow(1/2,Math.pow(2,z.getRe())+Math.pow(2,z.getIm())) > 2.0) return t;
-			z.multiply(z);
-			z.add(z0);
+		int iteration = 0;
+		double x = 0.0;
+		double y = 0.0;
+		while(Math.pow(2,x)+Math.pow(2,y) < 2*2 && iteration < max){
+			//ComplexNumber xtemp = Math.pow(2,z.getRe())-Math.pow(2,z.getIm())+
+			double xtemp = x*x-y*y+z.getRe();
+			y = 2*x*y + z.getIm();
+			x = xtemp;
+			
+			iteration++;
 		}
-		return max;
+		return iteration;
 	}
+	
+	
+	
 }
