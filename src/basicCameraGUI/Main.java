@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 /**
  * 
@@ -20,8 +21,10 @@ public class Main{
     	
         Model model = new FractalDisplayModel();
         View view = new StandardView();
-        Controller controller = new Controller(view,model);
-        controller.setUI(StandardView.UI_CLASS_ID, "StandardViewUI");
+        Controller controller = new Controller();
+        
+        UIManager.put(StandardView.UI_CLASS_ID, "StandardViewUI");
+        
         JFrame frame = new JFrame();
         
         

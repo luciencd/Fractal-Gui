@@ -37,11 +37,13 @@ public class StandardView extends View implements MouseListener{
 	
 	public void paint(Graphics g,JComponent c){
 		//do painting for the component here.
+		c.paint(g);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
+		System.out.println("Mouse clicked at position:"+e.getX()+" "+e.getY());
 		
 	}
 
