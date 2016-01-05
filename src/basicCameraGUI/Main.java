@@ -18,17 +18,18 @@ import javax.swing.JTextField;
 public class Main{
     public static void main(String[] args){
     	
-        JComponent model = new FractalDisplayModel();
-        System.out.println("start");
+        Model model = new FractalDisplayModel();
+        View view = new StandardView();
+        Controller controller = new Controller(view,model);
+        
         JFrame frame = new JFrame();
         
-
-        frame.add(model);
+        
+        frame.add(controller);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        //frame.add(panel);
-        
+
  
         
 
@@ -36,8 +37,7 @@ public class Main{
         frame.setVisible(true);
         frame.setSize(new Dimension(500,500));
 
-        System.out.println("final");
-        
+
 
     }
 }

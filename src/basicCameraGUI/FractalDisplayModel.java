@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.SwingPropertyChangeSupport;
 
-public class FractalDisplayModel extends JComponent {
+public class FractalDisplayModel implements Model{
 	private double x1;
 	private double y1;
 	private double x2;
@@ -91,7 +91,12 @@ public class FractalDisplayModel extends JComponent {
     	y2 = y2_;
     }
     
-    
+    public void setHeight(int height_){
+    	height = height_;
+    }
+    public void setWidth(int width_){
+    	width = width_;
+    }
     
     /**
      * Sets the value of resolution to resolution_
@@ -103,11 +108,8 @@ public class FractalDisplayModel extends JComponent {
     	resolution = resolution_;
     }
     
+    //remove
     
-    public void paintComponent(Graphics g){
-    	System.out.println("p: "+getWidth()+" "+getHeight());
-    	g.drawImage(image,0,0,getWidth(),getHeight(),this);
-    }
     
     
     public int getWidth(){
@@ -116,6 +118,9 @@ public class FractalDisplayModel extends JComponent {
     
     public int getHeight(){
     	return width;
+    }
+    public BufferedImage getImage(){
+    	return image;
     }
 	/**
 	 * 
