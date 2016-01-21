@@ -21,6 +21,7 @@ interface Model {
 	
 	abstract BufferedImage getImage();
 	
+	abstract void print();
 	
 
 }

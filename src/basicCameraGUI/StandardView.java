@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,9 +21,56 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.ComponentUI;
 
-public class StandardView extends View implements MouseListener{
+public class StandardView extends JFrame implements MouseListener{
 	public static final String UI_CLASS_ID = "StandardView";
 	
+    private DrawPanel drawPanel;
+    private toolsPanel toolsPanel;
+    
+    public StandardView()
+    {
+        prepareFrame();
+
+        initializeToolsPanelComponents();
+        drawPanel = new DrawPanel();
+
+        JPanel mainLayoutforApplication = new JPanel(new BorderLayout());
+
+        mainLayoutforApplication.add(toolsPanel, BorderLayout.SOUTH);
+        mainLayoutforApplication.add(drawPanel, BorderLayout.CENTER);
+        this.add(mainLayoutforApplication);
+        
+    } 
+    
+    public void prepareFrame()
+    {
+        setSize(500, 500);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // setResizable(false);
+        setVisible(true);
+    }
+    public void initializeToolsPanelComponents()
+    {
+    	System.out.println("initialize tools panelComponents.");
+        toolsPanel = new toolsPanel();
+        toolsPanel.setTools();
+    }
+    public DrawPanel getDrawPanel(){
+    	return drawPanel;
+    }
+    
+    public void paintComponent(Graphics g){
+    	System.out.println("StandardView paintComponents");
+    	toolsPanel.repaint();
+    	drawPanel.repaint();
+    }
+    public void repaint(){
+    	System.out.println("StandardView repaint");
+    	toolsPanel.repaint();
+    	drawPanel.repaint();
+    }
+    /*
 	public static ComponentUI createUI(JComponent c) {
 		return new StandardView();
 	}
@@ -33,12 +81,16 @@ public class StandardView extends View implements MouseListener{
 	
 	public void uninstallUI(JComponent c){
 		((Controller) c).removeMouseListener(this);
+	}*/
+	public void setImage(BufferedImage b){
+		System.out.println("setImage standardView");
+		drawPanel.setImage(b);
 	}
-	
-	public void paint(Graphics g,JComponent c){
+	/*public void paint(Graphics g,JComponent c){
 		//do painting for the component here.
+		System.out.println("StandardViewPaint");
 		c.paint(g);
-	}
+	}*/
 
 	@Override
 	public void mouseClicked(MouseEvent e) {

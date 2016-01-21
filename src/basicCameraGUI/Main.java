@@ -19,16 +19,19 @@ import javax.swing.UIManager;
 public class Main{
     public static void main(String[] args){
     	
-        Model model = new FractalDisplayModel();
-        View view = new StandardView();
+        //Model model = new FractalDisplayModel();
+        //View view = new StandardView();
+    	System.out.println("controller b4");
         Controller controller = new Controller();
+        System.out.println("controller aft4");
+        //controller.setModel(model);
+        //controller.setView(view);
+        //UIManager.put(StandardView.UI_CLASS_ID, "StandardViewUI");
         
-        UIManager.put(StandardView.UI_CLASS_ID, "StandardViewUI");
-        
-        JFrame frame = new JFrame();
+        //JFrame frame = new JFrame();
         
         
-        frame.add(controller);
+        /*frame.add(controller);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -38,7 +41,7 @@ public class Main{
 
 
         frame.setVisible(true);
-        frame.setSize(new Dimension(500,500));
+        frame.setSize(new Dimension(500,500));*/
 
 
 

@@ -34,7 +34,8 @@ public class FractalDisplayModel implements Model{
 	
 	
 	public FractalDisplayModel(){
-		this(0.5,1.0,0.0,1.0);
+		this(-1.0,1.0,-1.0,1.0);
+		//this(-10,10,-10,10);
 	}
 	
 	public FractalDisplayModel(double x1_,double x2_,double y1_,double y2_){
@@ -51,6 +52,7 @@ public class FractalDisplayModel implements Model{
 
     public void addListener(PropertyChangeListener prop) {
         propChangeFirer.addPropertyChangeListener(prop);
+        System.out.println("addListener");
     }
     
     /**
@@ -121,6 +123,9 @@ public class FractalDisplayModel implements Model{
     	return width;
     }
     public BufferedImage getImage(){
+    	System.out.println("getimagestart");
+    	image = computeImage();
+    	System.out.println("getimageend");
     	return image;
     }
     
@@ -140,33 +145,41 @@ public class FractalDisplayModel implements Model{
 	public BufferedImage computeImage(){
 		//x1, x2
 		//i1, i2 actual position of 4 corners in complex plane.
+		
 		BufferedImage img = new BufferedImage((int)getWidth(), (int)getHeight(),BufferedImage.TYPE_BYTE_GRAY);
 		//ComplexNumber center = new ComplexNumber(x,y);
 		
 		int max = 255;
 
 		Graphics g = img.getGraphics();
-
-		double stepx = (x2-x1)/resolution;
+		//g.setColor(new Color(0,255,0));
+		//g.drawLine(250,250,250,305);
+		double stepx = (x2-x1)/resolution;//
 		double stepy = (y2-y1)/resolution;
 		
-		int x = 0;
-		int y = 0;
-		for(double i = x1; i<x2+(getWidth()/resolution); i+=stepx){
-			x+=width/resolution;
+		double x = 0;
+		double y = 0;
+		double widthStep = (double)width/resolution;
+		double heightStep = (double)height/resolution;
+		
+		//p1 (0.5,0.0)-> p2 (1.0,1.0)
+		for(double i = x1; i<x2; i+=stepx){
+			x+=widthStep;
 			y = 0;
-			for(double j = y1; j<y2+(getHeight()/resolution);j+=stepy){
-				y+=height/resolution;
-				ComplexNumber z0 = new ComplexNumber(i,j);
-				int gray = max - mand(z0,max);
+			for(double j = y1; j<y2;j+=stepy){
 				
+				y+=heightStep;
+				ComplexNumber z0 = new ComplexNumber(i,j);
+				int gray =  max - mand(z0,max);
+
 				Color color;
 				
 				color = new Color(gray, gray, gray);
 				
 				
 				g.setColor(color);
-				g.drawLine(x,y,x,y);
+				//System.out.println(x+ " "+y+" "+gray);
+				g.drawLine((int)x,(int)y,(int)x,(int)y);
 			}
 			
 		}
@@ -196,6 +209,8 @@ public class FractalDisplayModel implements Model{
 		return iteration;
 	}
 	
-	
+	public void print(){
+		System.out.println("x1("+x1+") x2("+x2+") y1("+y1+") y2("+y2+")"+"res("+resolution+")"+"width("+getWidth()+") height("+getHeight()+")");
+	}
 	
 }
