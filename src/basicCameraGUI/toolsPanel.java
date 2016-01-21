@@ -1,5 +1,6 @@
 package basicCameraGUI;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 
@@ -11,15 +12,16 @@ import javax.swing.JTextField;
 public class toolsPanel extends JPanel
 {
 
-    private JButton colorButton, rectangleButton, circleButton, pencilButton, lineButton, rubberButton,
-            fillClosedShapeButton;
-    private JLabel tipText;
+    JButton colorButton;
     
-    private JTextField x1;
-    private JTextField x2;
-    private JTextField y1;
-    private JTextField y2;
+    JTextField x1;
+    JTextField x2;
+    JTextField y1;
+    JTextField y2;
     
+    private Dimension preferred = new Dimension(100,100);
+    private Dimension maximum = new Dimension(130,130);
+    private Dimension minimum = new Dimension(90,90);
     public toolsPanel()
     {
     	
@@ -27,7 +29,7 @@ public class toolsPanel extends JPanel
 
     public void setTools()
     {
-        int numberOfColumns = 1; // = 0 many columns as necessary
+        int numberOfColumns = 4; // = 0 many columns as necessary
         int numberOfRows = 5; // 0 = many rows as necessary
         this.setLayout(new GridLayout(numberOfRows, numberOfColumns));
         
@@ -35,14 +37,26 @@ public class toolsPanel extends JPanel
         x2 = new JTextField();
         y1 = new JTextField();
         y2 = new JTextField();
-        colorButton = new JButton();
+        colorButton = new JButton("submit");
         this.add(x1);
         this.add(x2);
         this.add(y1);
         this.add(y2);
         this.add(colorButton);
     }
-
+    
+    /*@Override
+    public Dimension getPreferredSize(){
+    	return preferred;
+    }
+    @Override
+    public Dimension getMaximumSize(){
+    	return maximum;
+    }
+    @Override
+    public Dimension getMinimumSize(){
+    	return minimum;
+    }*/
 
 
 

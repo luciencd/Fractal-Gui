@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -24,8 +25,8 @@ import javax.swing.plaf.ComponentUI;
 public class StandardView extends JFrame implements MouseListener{
 	public static final String UI_CLASS_ID = "StandardView";
 	
-    private DrawPanel drawPanel;
-    private toolsPanel toolsPanel;
+    DrawPanel drawPanel;
+    toolsPanel toolsPanel;
     
     public StandardView()
     {
@@ -58,6 +59,9 @@ public class StandardView extends JFrame implements MouseListener{
     }
     public DrawPanel getDrawPanel(){
     	return drawPanel;
+    }
+    public toolsPanel getToolsPanel(){
+    	return toolsPanel;
     }
     
     public void paintComponent(Graphics g){
