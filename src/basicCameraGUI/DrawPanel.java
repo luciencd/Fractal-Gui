@@ -55,20 +55,15 @@ public class DrawPanel extends JPanel
         /*drawing history of the component*/
         /*how to get different styles of history??*/
         Coordinate<Double> past;
-    	if(history.size() == 0){
-    		past = new Coordinate<Double>((double)getWidth()/2,(double)getHeight()/2);
-    	}else{
-    		past = history.get(0);
+    	if(historyVisible){
+	        for(Coordinate<Double> item : history){//really awkward.
+	        	//System.out.println(past.x.intValue()+" "+past.y.intValue());
+	        	g.setColor(new Color(0,255,0));
+	        	g.fillOval(item.x.intValue(), item.y.intValue(), 2,2);
+	        	//g.drawLine(past.x.intValue(), past.y.intValue(), item.x.intValue(), item.y.intValue());
+	        	past = item;
+	        }
     	}
-    	
-        for(Coordinate<Double> item : history){//really awkward.
-        	//System.out.println(past.x.intValue()+" "+past.y.intValue());
-        	g.setColor(new Color(0,255,0));
-        	g.fillOval(item.x.intValue(), item.y.intValue(), 2,2);
-        	g.drawLine(past.x.intValue(), past.y.intValue(), item.x.intValue(), item.y.intValue());
-        	past = item;
-        }
-        
         
     }
 

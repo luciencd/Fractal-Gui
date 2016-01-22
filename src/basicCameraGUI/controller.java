@@ -9,8 +9,13 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -24,17 +29,21 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	private int Previousx = 0;
 	private int Previousy = 0;
 	
-	private int width = 500;
-	private int height = 500;
-	private int baseRes = 500;
+	private int width = 700;
+	private int height = 700;
+	private int baseRes;
 
 	public Controller(){
+		baseRes = 700;
         setModel(new FractalDisplayModel());
         setView(new StandardView());
         getModel().setWidth(width);
         getModel().setHeight(height);
+        getModel().setResolution(baseRes);
+        
         VIEW.drawPanel.setWidth(width);
         VIEW.drawPanel.setHeight(height);
+        
         
         MODEL.updateImage();
 		VIEW.setImage(MODEL.getImage());
@@ -60,12 +69,15 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	
 	public void setView(StandardView v){
 		VIEW = v;
-		//Adding Listeners.
+		//Adding Listeners. BUTTONS
 		VIEW.toolsPanel.colorButton.addActionListener(this);
 		VIEW.toolsPanel.zoomButton.addActionListener(this);
 		VIEW.toolsPanel.resolutionButton.addActionListener(this);
+		VIEW.toolsPanel.saveButton.addActionListener(this);
+		//VISUAL AREA MOUSE LISTENER
 		VIEW.drawPanel.addMouseMotionListener(this);
 		VIEW.drawPanel.addMouseListener(this);
+		
 		
 		
 	}
@@ -138,6 +150,8 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			//System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
 			updateModel();
 			resetViewPanel();
+		}else if(e.getActionCommand().equals("save")){
+			save();
 		}
 		
 	}
@@ -225,14 +239,16 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
 		VIEW.getDrawPanel().historyVisible = false;
+		
+		resetViewPanel();
 	}
 
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		System.out.println("mouse moved");
+		//System.out.println("mouse moved");
 		//Want to show white arrow showing movement of particles inside space.
-		System.out.println("MOUSE POS: ("+e.getX()+","+e.getY()+")");
+		//System.out.println("MOUSE POS: ("+e.getX()+","+e.getY()+")");
 		double real_x = MODEL.windowToRealX(e.getX());
 		double real_y = MODEL.windowToRealY(e.getY());
 		ComplexNumber z0 = new ComplexNumber(real_x,real_y);
@@ -241,7 +257,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		history.add(new Coordinate<Double>((double)e.getX(),(double)e.getY()));
 		
 		MODEL.print();*/
-		System.out.println("ACTUAL POS: ("+(real_x)+","+(real_y)+")");
+		//System.out.println("ACTUAL POS: ("+(real_x)+","+(real_y)+")");
 		ArrayList<Coordinate<Double>> history = MODEL.listCoordinates(z0,255);
 		for(Coordinate<Double> item : history){
 			//System.out.println("co: "+item.x+" "+item.y);
@@ -263,5 +279,21 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	public void stateChanged(ChangeEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	public void save(){
+		BufferedImage bi = MODEL.getImage();
+		//Add location to save name too. or inside the actual data of the file.
+		String saveName = Double.toString(new Random().nextDouble());
+		
+	    File outputfile = new File(System.getProperty("user.home")+File.separator+"Documents"+"/fractals/"+saveName+".png");
+	    try{
+	    	System.out.println("saved file at:"+ saveName+".png");
+	    	ImageIO.write(bi, "png", outputfile);
+	    }catch(IOException e){
+	    	
+	    }
+	    
 	}
 }

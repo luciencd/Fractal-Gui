@@ -5,9 +5,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.JobAttributes;
 import java.awt.PageAttributes;
 import java.awt.PrintJob;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
@@ -25,12 +27,15 @@ public class FractalDisplayModel implements Model, ChangeListener{
 	private double x2;
 	private double y2;
 	
-	
+	private int[][]cache;
+	private boolean[][]set;
+	int cycles = 0;
+	int runs = 0;
 	private BufferedImage image;
 	
 	private int width;// = 400; 
 	private int height;// = 400;
-	private double resolution = 500;
+	private double resolution;// = 500;
 	private ComplexNumber z;
 	private SwingPropertyChangeSupport propChangeFirer;
 
@@ -135,11 +140,11 @@ public class FractalDisplayModel implements Model, ChangeListener{
     //taking real values 0.23123 =>  230px
     public double realToWindowX(double x){
     	double widthFraction = (x-x1)/(x2-x1);
-    	return widthFraction*width;
+    	return widthFraction*(double)(width);
     }
     public double realToWindowY(double y){
     	double heightFraction = (y-y1)/(y2-y1);
-    	return heightFraction*height;
+    	return heightFraction*(double)(height);
     }
     
     //passing by reference to edit x and y
@@ -164,7 +169,11 @@ public class FractalDisplayModel implements Model, ChangeListener{
     	return width;
     }
     public void updateImage(){
+    	cache = new int[height][width];
+    	set = new boolean[height][width];
     	image = computeImage();
+    	
+    	
     }
     public BufferedImage getImage(){
     	return image;
@@ -192,8 +201,12 @@ public class FractalDisplayModel implements Model, ChangeListener{
 		BufferedImage img = new BufferedImage((int)getWidth(), (int)getHeight(),BufferedImage.TYPE_INT_RGB);
 		//ComplexNumber center = new ComplexNumber(x,y);
 		
-		Integer max = 120;
+		
+		Integer max = 400;
 
+		/*Graphics2D g = (Graphics2D)img.getGraphics();
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);*/
 		Graphics g = img.getGraphics();
 		//g.setColor(new Color(0,255,0));
 		//g.drawLine(250,250,250,305);
@@ -206,14 +219,15 @@ public class FractalDisplayModel implements Model, ChangeListener{
 		double heightStep = (double)height/resolution;
 		
 		//p1 (0.5,0.0)-> p2 (1.0,1.0)
+		System.out.println("start IMAGE");
 		for(double i = x1; i<x2; i+=stepx){
-			x+=widthStep;
+			
 			y = 0;
 			for(double j = y1; j<y2;j+=stepy){
 				
-				y+=heightStep;
+				
 				ComplexNumber z0 = new ComplexNumber(i,j);
-				double gray =  max - mand(z0,max);
+				double gray = max-mand(z0,max);
 				Color color;
 				
 				Color FAR = new Color(255, 255, 30);
@@ -221,7 +235,7 @@ public class FractalDisplayModel implements Model, ChangeListener{
 
 				
 				//0...255 scale.
-				double scale =((gray/(double)max));
+				double scale = (gray%20)/20;//((gray/(double)max));
 				if(gray == max){
 					
 					color = new Color(255,0,255);
@@ -235,38 +249,119 @@ public class FractalDisplayModel implements Model, ChangeListener{
 				}
 				
 				
-				g.setColor(color);
-				//System.out.println(x+ " "+y+" "+gray);
-				g.drawLine((int)x,(int)y,(int)x,(int)y);
+				//g.setColor(color);
+				if(gray<0){
+					System.out.println(x+ " "+y+" "+gray+" "+scale+" "+color);
+				}
+				
+				if(x > 0 && y > 0 && x <img.getWidth() && y <img.getHeight()){
+					img.setRGB((int)x, (int)y, color.getRGB());
+				}
+				
+				//g.drawLine((int)x,(int)y,(int)x,(int)y);
+				y+=heightStep;
 			}
-			
+			x+=widthStep;
 		}
+		System.out.println("end IMAGE");
+		System.out.println("Cycles saved: "+cycles);
+		System.out.println("Cycles total: "+runs);
+
 		return img;
 		
 	}
 	
+	/**
+	 * fucking fuck caches don't work apparently...
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean isSet(double x, double y){
+		int pixel_x = (int)realToWindowX(x);
+		int pixel_y = (int)realToWindowY(y);
+		if(pixel_x <0 || pixel_x >= width || pixel_y <0 || pixel_y >= height){
+			return false;
+		}
+		return set[pixel_x][pixel_y];
+		
+	}
+	public int cache(double x, double y){
+		int pixel_x = (int)realToWindowX(x);
+		int pixel_y = (int)realToWindowY(y);
+		if(pixel_x <0 || pixel_x >= width || pixel_y <0 || pixel_y >= height){
+			System.out.println("out of bounds");
+			return 0;
+		}
+		return cache[pixel_x][pixel_y];
+	}
+	public void setCache(double x, double y, int val){
+		int pixel_x = (int)realToWindowX(x);
+		int pixel_y = (int)realToWindowY(y);
+		
+		if(pixel_x <0 || pixel_x >= width || pixel_y <0 || pixel_y >= height){
+			System.out.println("out of bounds");
+			return;
+		}
+
+		//System.out.println(val);
+		cache[pixel_x][pixel_y] = val;
+		set[pixel_x][pixel_y] = true;
+	}
 	/**
 	 * 
 	 * @param z0
 	 * @param max
 	 * @return how many iterations it took to leave z0
 	 */
-	public static int mand(ComplexNumber z0,int max){
+	//Depends on a cache.
+	public int mand(ComplexNumber z0,int max){
 		ComplexNumber z = z0;
 		int iteration = 0;
-		double x = 0.0;
-		double y = 0.0;
+		double initx = z.getRe();
+		double inity = z.getIm();
+		double x = z.getRe();
+		double y = z.getIm();
+		
+		/*if(isSet(x,y)){
+			iteration = cache(x,y);
+			cycles+=iteration;
+			return iteration;
+		}*/
+
 		while(Math.pow(2,x)+Math.pow(2,y) < 2*2){
+			
+			/*if(isSet(x,y) == true){
+				//cycles+=iteration;
+				iteration = cache(x,y);
+				cycles+=iteration;
+				return iteration;
+			}*/
+			//setCache(x,y,iteration);
+			
+			++runs;
 			if(iteration>=max){
-				break;
+				//setCache(initx,inity,iteration);
+				return iteration;
 			}
+			/**/
 			
 			double xtemp = x*x-y*y+z.getRe();
 			y = 2*x*y + z.getIm();
 			x = xtemp;
 			
+			//refer to cache to see if we have already calculated the iterations for this point.
+			
+			
+			
 			iteration++;
+			
 		}
+		//Setting the number of iterations it takes to get from this pixel to the outside.
+		
+		//setCache(initx,inity,iteration);
+		
+		
 		return iteration;
 	}
 	
@@ -277,8 +372,8 @@ public class FractalDisplayModel implements Model, ChangeListener{
 	public ArrayList<Coordinate<Double>> listCoordinates(ComplexNumber z0,int max){
 		ComplexNumber z = z0;
 		int iteration = 0;
-		double x = 0.0;
-		double y = 0.0;
+		double x = z0.getRe();
+		double y = z0.getIm();
 		ArrayList<Coordinate<Double>> history = new ArrayList<Coordinate<Double>>();
 		history.add(new Coordinate<Double>(z.getRe(),z.getIm()));
 	

@@ -16,6 +16,7 @@ public class toolsPanel extends JPanel
     JButton colorButton;
     JButton zoomButton;
     JButton resolutionButton;
+    JButton saveButton;
     
     JTextField x1;
     JTextField x2;
@@ -48,7 +49,7 @@ public class toolsPanel extends JPanel
     public void setTools()
     {
         int numberOfColumns = 2; // = 0 many columns as necessary
-        int numberOfRows = 4; // 0 = many rows as necessary
+        int numberOfRows = 5; // 0 = many rows as necessary
         this.setLayout(new GridLayout(numberOfRows, numberOfColumns));
         
         x1 = new JTextField();
@@ -60,6 +61,7 @@ public class toolsPanel extends JPanel
         colorButton = new JButton("submit");
         zoomButton = new JButton("zoom");
         resolutionButton = new JButton("resolution");
+        saveButton = new JButton("save");
         this.add(x1);
         this.add(x2);
         this.add(y1);
@@ -69,6 +71,7 @@ public class toolsPanel extends JPanel
         this.add(zoomButton);
         this.add(resolution);
         this.add(resolutionButton);
+        this.add(saveButton);
     }
     
     /*@Override

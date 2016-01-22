@@ -46,7 +46,7 @@ public class StandardView extends JFrame implements MouseListener{
     
     public void prepareFrame()
     {
-        setSize(500, 600);
+        setSize(700, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         // setResizable(false);
@@ -54,7 +54,7 @@ public class StandardView extends JFrame implements MouseListener{
     }
     public void initializeToolsPanelComponents()
     {
-    	System.out.println("initialize tools panelComponents.");
+    	//System.out.println("initialize tools panelComponents.");
         toolsPanel = new toolsPanel();
         toolsPanel.setTools();
     }
@@ -66,12 +66,12 @@ public class StandardView extends JFrame implements MouseListener{
     }
     
     public void paintComponent(Graphics g){
-    	System.out.println("StandardView paintComponents");
+    	//System.out.println("StandardView paintComponents");
     	toolsPanel.repaint();
     	drawPanel.repaint();
     }
     public void repaint(){
-    	System.out.println("StandardView repaint");
+    	//System.out.println("StandardView repaint");
     	toolsPanel.repaint();
     	drawPanel.repaint();
     }
@@ -88,7 +88,7 @@ public class StandardView extends JFrame implements MouseListener{
 		((Controller) c).removeMouseListener(this);
 	}*/
 	public void setImage(BufferedImage b){
-		System.out.println("setImage standardView");
+		//System.out.println("setImage standardView");
 		drawPanel.setImage(b);
 	}
 	/*public void paint(Graphics g,JComponent c){
