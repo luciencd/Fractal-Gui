@@ -93,6 +93,10 @@ public class FractalDisplayModel implements Model{
     public void setY2(double y2_){
     	y2 = y2_;
     }
+    public double getX1(){return x1;}
+    public double getX2(){return x2;}
+    public double getY1(){return y1;}
+    public double getY2(){return y2;}
     
     public void setHeight(int height_){
     	height = height_;
@@ -100,6 +104,8 @@ public class FractalDisplayModel implements Model{
     public void setWidth(int width_){
     	width = width_;
     }
+    
+
     
     /**
      * Sets the value of resolution to resolution_
@@ -111,7 +117,44 @@ public class FractalDisplayModel implements Model{
     	resolution = resolution_;
     }
     
-    //remove
+    //take in a square of the image and generate the two coordinates based on it.
+    public void squareVision(double x1,double x2,double y1,double y2){
+    	
+    }
+    
+    public void zoom(double zoom){
+    	x1/=zoom;
+    	x2/=zoom;
+    	y1/=zoom;
+    	y2/=zoom;
+    }
+    
+    //passing by reference to edit x and y
+    //taking real values 0.23123 =>  230px
+    public double realToWindowX(double x){
+    	double widthDouble = x2-x1;
+    	double widthFraction = (double)x/width;
+    	return (x-x1)/widthDouble;
+    }
+    public double realToWindowY(double y){
+    	double heightDouble = y2-y1;
+    	double heightFraction = (double)y/height;
+    	return (y-y1)/heightDouble;
+    }
+    
+    //passing by reference to edit x and y
+    //taking window values 230px => .5611
+    public double windowToRealX(double x){
+    	double widthDouble = x2-x1;
+    	double widthFraction = (double)x/width;
+    	return widthDouble*(widthFraction)+x1;
+    }
+    
+    public double windowToRealY(double y){
+    	double heightDouble = y2-y1;
+    	double heightFraction = (double)y/height;
+    	return heightDouble*(heightFraction)+y1;
+    }
     
     
     
@@ -208,6 +251,11 @@ public class FractalDisplayModel implements Model{
 		}
 		return iteration;
 	}
+	
+	/**
+	 * Generates a list of coordinates based on the start of a single complex number(getting journey of single element).
+	 * return List<
+	 */
 	
 	public void print(){
 		System.out.println("x1("+x1+") x2("+x2+") y1("+y1+") y2("+y2+")"+"res("+resolution+")"+"width("+getWidth()+") height("+getHeight()+")");
