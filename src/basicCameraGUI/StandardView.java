@@ -46,7 +46,7 @@ public class StandardView extends JFrame implements MouseListener{
     
     public void prepareFrame()
     {
-        setSize(700, 800);
+        setSize(500, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         // setResizable(false);

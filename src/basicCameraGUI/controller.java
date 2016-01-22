@@ -29,12 +29,12 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	private int Previousx = 0;
 	private int Previousy = 0;
 	
-	private int width = 700;
-	private int height = 700;
+	private int width = 500;
+	private int height = 500;
 	private int baseRes;
 
 	public Controller(){
-		baseRes = 700;
+		baseRes = 500;
         setModel(new FractalDisplayModel());
         setView(new StandardView());
         getModel().setWidth(width);
@@ -146,12 +146,29 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			
 		}else if(e.getActionCommand().equals("resolution")){
 			int baseRes = VIEW.toolsPanel.getResolution();
+			System.out.println("resolution");
 			pixelize(baseRes);
 			//System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
 			updateModel();
 			resetViewPanel();
+			System.out.println("resoluted");
 		}else if(e.getActionCommand().equals("save")){
+			int baseRes = VIEW.toolsPanel.getResolution();
+			
+			int prevWidth = MODEL.getWidth();
+			int prevHeight = MODEL.getHeight();
+			
+			MODEL.setWidth(baseRes);
+			MODEL.setHeight(baseRes);
+			MODEL.setResolution(baseRes);
+			System.out.println("Update image:");
+			MODEL.updateImage();
 			save();
+			System.out.println("Updated image.");
+			MODEL.setResolution(prevWidth);
+			MODEL.setWidth(prevWidth);
+			MODEL.setHeight(prevHeight);
+			
 		}
 		
 	}
@@ -174,7 +191,12 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	}
 	
 	//Makes generating the fractal faster.
+	public void defaultPixels(){
+		pixelize(width);
+		
+	}
 	public void pixelize(int resolution){
+		baseRes = resolution;
 		MODEL.setResolution(resolution);
 	}
 
@@ -220,7 +242,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		//System.out.println("released.");
-		pixelize(baseRes);
+		defaultPixels();
 		updateModel();
 		resetViewPanel();
 		
@@ -283,6 +305,8 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	
 	
 	public void save(){
+		System.out.println(baseRes);
+		
 		BufferedImage bi = MODEL.getImage();
 		//Add location to save name too. or inside the actual data of the file.
 		String saveName = Double.toString(new Random().nextDouble());

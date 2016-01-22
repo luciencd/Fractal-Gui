@@ -169,8 +169,7 @@ public class FractalDisplayModel implements Model, ChangeListener{
     	return width;
     }
     public void updateImage(){
-    	cache = new int[height][width];
-    	set = new boolean[height][width];
+    	
     	image = computeImage();
     	
     	
@@ -221,7 +220,9 @@ public class FractalDisplayModel implements Model, ChangeListener{
 		//p1 (0.5,0.0)-> p2 (1.0,1.0)
 		System.out.println("start IMAGE");
 		for(double i = x1; i<x2; i+=stepx){
-			
+			if((x)%(resolution/10) == 0){
+				System.out.println((100*x)/resolution+"% done.");
+			}
 			y = 0;
 			for(double j = y1; j<y2;j+=stepy){
 				
@@ -230,12 +231,19 @@ public class FractalDisplayModel implements Model, ChangeListener{
 				double gray = max-mand(z0,max);
 				Color color;
 				
-				Color FAR = new Color(255, 255, 30);
-				Color CLOSE = new Color(128, 0,0);
+				//Color FAR = new Color(255,0,0);
+				//Color CLOSE = new Color(0, 0,255);
 
 				
-				//0...255 scale.
-				double scale = (gray%20)/20;//((gray/(double)max));
+				//0...1 scale.
+				Color FAR = new Color(255, 255, 30);
+				Color CLOSE = new Color(128, 0,0);
+				
+				//Color FAR = new Color(255, 0, 30);
+				//Color CLOSE = new Color(0, 255,0);
+				//double scale =((gray/(double)max));
+				//double scale = (1+Math.sin((gray)/10))/2; blue to red and back looks really grainy.
+				double scale = (gray%20)/20;
 				if(gray == max){
 					
 					color = new Color(255,0,255);
