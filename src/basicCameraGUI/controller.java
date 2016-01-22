@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -23,14 +24,21 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	private int Previousx = 0;
 	private int Previousy = 0;
 	
+	private int width = 500;
+	private int height = 500;
 	private int baseRes = 500;
 
 	public Controller(){
         setModel(new FractalDisplayModel());
         setView(new StandardView());
-        System.out.println("start");
+        getModel().setWidth(width);
+        getModel().setHeight(height);
+        VIEW.drawPanel.setWidth(width);
+        VIEW.drawPanel.setHeight(height);
+        
+        MODEL.updateImage();
 		VIEW.setImage(MODEL.getImage());
-		System.out.println("end");
+
 		VIEW.getDrawPanel().repaint();
 		VIEW.getDrawPanel().revalidate();//This resets it all after all elements have been generated.
         
@@ -41,6 +49,8 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	
 	public void setModel(Model m){
 		MODEL = m;
+		MODEL.addChangeListener(this);
+		
 		//MODEL.addChangeListener(this);
 	}
 	public Model getModel(){
@@ -56,13 +66,19 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		VIEW.toolsPanel.resolutionButton.addActionListener(this);
 		VIEW.drawPanel.addMouseMotionListener(this);
 		VIEW.drawPanel.addMouseListener(this);
+		
+		
 	}
 	public StandardView getView(){
 		return VIEW;
 	}
 	
-
+	//Need to make sure this gets called only when the model actually changed.
+	public void updateModel(){
+		MODEL.updateImage();
+	}
 	public void resetViewPanel(){
+		
 		BufferedImage b = MODEL.getImage();
 		VIEW.setImage(b);
 		//Reseting View.
@@ -77,7 +93,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		//Data to the model, but drawpanel actionlistener is void..
 		
 		//Pretty sure im not supposed to have a switch statement ever.
-		System.out.println("action: "+e.getActionCommand());
+		//System.out.println("action: "+e.getActionCommand());
 		if(e.getActionCommand().equals("submit")){
 			
 			//Getting information from toolsPanel textboxes.
@@ -88,6 +104,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			MODEL.setY2(coords[3]);
 			
 			//Setting View.
+			updateModel();
 			resetViewPanel();
 			
 		}else if(e.getActionCommand().equals("zoom")){
@@ -102,22 +119,24 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			double centerx = newX1-(width/2.0);
 			double centery = newY1-(height/2.0);
 			
-			newX1 += width/4;
-			newX2 -= width/4;
-			newY1 += height/4;
-			newY2 -= height/4;//divides area in half.
+			newX1 += width/3;
+			newX2 -= width/3;
+			newY1 += height/3;
+			newY2 -= height/3;//divides area in half.
 			
 			MODEL.setX1(newX1);
 			MODEL.setX2(newX2);
 			MODEL.setY1(newY1);
 			MODEL.setY2(newY2);
 			//Setting view
+			updateModel();
 			resetViewPanel();
 			
 		}else if(e.getActionCommand().equals("resolution")){
 			int baseRes = VIEW.toolsPanel.getResolution();
 			pixelize(baseRes);
-			System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
+			//System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
+			updateModel();
 			resetViewPanel();
 		}
 		
@@ -148,7 +167,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	@Override 
 	public void mouseDragged(MouseEvent e){
 		pixelize(50);
-		System.out.println("dragged");
+		//System.out.println("dragged");
 		int currentMX = e.getX();
 		int currentMY = e.getY();
 		
@@ -158,9 +177,8 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		pan(-posX,-posY);
 		Previousx = currentMX;
 		Previousy = currentMY;
-		VIEW.setImage(MODEL.getImage());
-		VIEW.getDrawPanel().repaint();
-		VIEW.getDrawPanel().revalidate();
+		resetViewPanel();
+		updateModel();
 		//Now that we changed(panned) we should probably reset image.
 		
 		
@@ -178,7 +196,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		// TODO Auto-generated method stub
 		Previousx = e.getX();
 		Previousy = e.getY();
-		System.out.println("pressed");
+		//System.out.println("pressed");
 		pixelize(50);
 		
 	}
@@ -187,12 +205,12 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("released.");
+		//System.out.println("released.");
 		pixelize(baseRes);
-		VIEW.setImage(MODEL.getImage());
-		VIEW.getDrawPanel().repaint();
-		VIEW.getDrawPanel().revalidate();
-		MODEL.print();
+		updateModel();
+		resetViewPanel();
+		
+		//MODEL.print();
 	}
 
 
@@ -206,13 +224,37 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+		VIEW.getDrawPanel().historyVisible = false;
 	}
 
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
+		System.out.println("mouse moved");
+		//Want to show white arrow showing movement of particles inside space.
+		System.out.println("MOUSE POS: ("+e.getX()+","+e.getY()+")");
+		double real_x = MODEL.windowToRealX(e.getX());
+		double real_y = MODEL.windowToRealY(e.getY());
+		ComplexNumber z0 = new ComplexNumber(real_x,real_y);
+		
+		/*ArrayList<Coordinate<Double>> history = new ArrayList<Coordinate<Double>>();
+		history.add(new Coordinate<Double>((double)e.getX(),(double)e.getY()));
+		
+		MODEL.print();*/
+		System.out.println("ACTUAL POS: ("+(real_x)+","+(real_y)+")");
+		ArrayList<Coordinate<Double>> history = MODEL.listCoordinates(z0,255);
+		for(Coordinate<Double> item : history){
+			//System.out.println("co: "+item.x+" "+item.y);
+			item.x = MODEL.realToWindowX(item.x);
+			item.y = MODEL.realToWindowY(item.y);
+			//System.out.println("af:"+item.x+" "+item.y);
+		}
+		VIEW.getDrawPanel().historyVisible = true;
+		VIEW.getDrawPanel().setHistory(history);
+		
+		resetViewPanel();
+		
+		//DrawPanel.historyVisible = true;
 		
 	}
 

@@ -11,13 +11,15 @@ import java.awt.PrintJob;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.SwingPropertyChangeSupport;
 
-public class FractalDisplayModel implements Model{
+public class FractalDisplayModel implements Model, ChangeListener{
 	private double x1;
 	private double y1;
 	private double x2;
@@ -26,12 +28,12 @@ public class FractalDisplayModel implements Model{
 	
 	private BufferedImage image;
 	
-	private int width = 500; 
-	private int height = 500;
+	private int width;// = 400; 
+	private int height;// = 400;
 	private double resolution = 500;
 	private ComplexNumber z;
 	private SwingPropertyChangeSupport propChangeFirer;
-	
+
 	
 	public FractalDisplayModel(){
 		this(-1.0,1.0,-1.0,1.0);
@@ -45,8 +47,8 @@ public class FractalDisplayModel implements Model{
 		y2=y2_;
 		
 		//propChangeFirer = new SwingPropertyChangeSupport(this);
-		image = computeImage();
-		System.out.println("image constructor2");
+		//image = computeImage();
+		//System.out.println("image constructor2");
 	}
 
 
@@ -132,28 +134,24 @@ public class FractalDisplayModel implements Model{
     //passing by reference to edit x and y
     //taking real values 0.23123 =>  230px
     public double realToWindowX(double x){
-    	double widthDouble = x2-x1;
-    	double widthFraction = (double)x/width;
-    	return (x-x1)/widthDouble;
+    	double widthFraction = (x-x1)/(x2-x1);
+    	return widthFraction*width;
     }
     public double realToWindowY(double y){
-    	double heightDouble = y2-y1;
-    	double heightFraction = (double)y/height;
-    	return (y-y1)/heightDouble;
+    	double heightFraction = (y-y1)/(y2-y1);
+    	return heightFraction*height;
     }
     
     //passing by reference to edit x and y
     //taking window values 230px => .5611
     public double windowToRealX(double x){
-    	double widthDouble = x2-x1;
-    	double widthFraction = (double)x/width;
-    	return widthDouble*(widthFraction)+x1;
+    	double w = x/width;//50%
+    	return w*(x2-x1)+x1;//50% of the difference(midpoint)+first point
     }
     
     public double windowToRealY(double y){
-    	double heightDouble = y2-y1;
-    	double heightFraction = (double)y/height;
-    	return heightDouble*(heightFraction)+y1;
+    	double h = y/height;
+    	return h*(y2-y1)+y1;
     }
     
     
@@ -165,18 +163,20 @@ public class FractalDisplayModel implements Model{
     public int getHeight(){
     	return width;
     }
-    public BufferedImage getImage(){
-    	System.out.println("getimagestart");
+    public void updateImage(){
     	image = computeImage();
-    	System.out.println("getimageend");
+    }
+    public BufferedImage getImage(){
     	return image;
     }
     
     public void removeChangeListener(Controller c){
     	
     }
+    
+    //Do something with this.
     public void addChangeListener(Controller c){
-    	
+    	//listenerList.add(ChangeListener.class, c);
     }
     
 	/**
@@ -189,10 +189,10 @@ public class FractalDisplayModel implements Model{
 		//x1, x2
 		//i1, i2 actual position of 4 corners in complex plane.
 		
-		BufferedImage img = new BufferedImage((int)getWidth(), (int)getHeight(),BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage((int)getWidth(), (int)getHeight(),BufferedImage.TYPE_INT_RGB);
 		//ComplexNumber center = new ComplexNumber(x,y);
 		
-		int max = 255;
+		Integer max = 120;
 
 		Graphics g = img.getGraphics();
 		//g.setColor(new Color(0,255,0));
@@ -213,11 +213,26 @@ public class FractalDisplayModel implements Model{
 				
 				y+=heightStep;
 				ComplexNumber z0 = new ComplexNumber(i,j);
-				int gray =  max - mand(z0,max);
-
+				double gray =  max - mand(z0,max);
 				Color color;
 				
-				color = new Color(gray, gray, gray);
+				Color FAR = new Color(255, 255, 30);
+				Color CLOSE = new Color(128, 0,0);
+
+				
+				//0...255 scale.
+				double scale =((gray/(double)max));
+				if(gray == max){
+					
+					color = new Color(255,0,255);
+				}else{
+					int red = (int)Math.abs((scale * FAR.getRed()) + ((1 - scale) * CLOSE.getRed()));
+					int green = (int)Math.abs((scale * FAR.getGreen()) + ((1 - scale) * CLOSE.getGreen()));
+					int blue = (int)Math.abs((scale * FAR.getBlue()) + ((1 - scale) * CLOSE.getBlue()));
+					//System.out.println(red+" "+green+ " "+blue);
+					
+					color = new Color(red,green,blue);
+				}
 				
 				
 				g.setColor(color);
@@ -241,8 +256,11 @@ public class FractalDisplayModel implements Model{
 		int iteration = 0;
 		double x = 0.0;
 		double y = 0.0;
-		while(Math.pow(2,x)+Math.pow(2,y) < 2*2 && iteration < max){
-			//ComplexNumber xtemp = Math.pow(2,z.getRe())-Math.pow(2,z.getIm())+
+		while(Math.pow(2,x)+Math.pow(2,y) < 2*2){
+			if(iteration>=max){
+				break;
+			}
+			
 			double xtemp = x*x-y*y+z.getRe();
 			y = 2*x*y + z.getIm();
 			x = xtemp;
@@ -256,9 +274,37 @@ public class FractalDisplayModel implements Model{
 	 * Generates a list of coordinates based on the start of a single complex number(getting journey of single element).
 	 * return List<
 	 */
+	public ArrayList<Coordinate<Double>> listCoordinates(ComplexNumber z0,int max){
+		ComplexNumber z = z0;
+		int iteration = 0;
+		double x = 0.0;
+		double y = 0.0;
+		ArrayList<Coordinate<Double>> history = new ArrayList<Coordinate<Double>>();
+		history.add(new Coordinate<Double>(z.getRe(),z.getIm()));
+	
+		while(Math.pow(2,x)+Math.pow(2,y) < 2*2){
+			if(iteration>=max){
+				break;
+			}
+			
+			double xtemp = x*x-y*y+z.getRe();
+			y = 2*x*y + z.getIm();
+			x = xtemp;
+			history.add(new Coordinate<Double>(x,y));
+			
+			iteration++;
+		}
+		return history;
+	}
 	
 	public void print(){
 		System.out.println("x1("+x1+") x2("+x2+") y1("+y1+") y2("+y2+")"+"res("+resolution+")"+"width("+getWidth()+") height("+getHeight()+")");
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		// TODO Auto-generated method stub
+		image = computeImage();
 	}
 	
 }

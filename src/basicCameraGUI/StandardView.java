@@ -34,6 +34,7 @@ public class StandardView extends JFrame implements MouseListener{
 
         initializeToolsPanelComponents();
         drawPanel = new DrawPanel();
+        //drawPanel.setSize(400,400);
 
         JPanel mainLayoutforApplication = new JPanel(new BorderLayout());
 
@@ -45,7 +46,7 @@ public class StandardView extends JFrame implements MouseListener{
     
     public void prepareFrame()
     {
-        setSize(500, 500);
+        setSize(500, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         // setResizable(false);

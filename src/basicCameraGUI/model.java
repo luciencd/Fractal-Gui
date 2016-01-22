@@ -1,6 +1,7 @@
 package basicCameraGUI;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.event.ChangeListener;
 
@@ -30,9 +31,13 @@ interface Model {
 	abstract int getWidth();
 	abstract int getHeight();
 	
+	abstract void updateImage();
 	abstract BufferedImage getImage();
 	
 	abstract void print();
+	
+	abstract ArrayList<Coordinate<Double>> listCoordinates(ComplexNumber z0,int max);
+	abstract void addChangeListener(Controller controller);
 	
 
 }
