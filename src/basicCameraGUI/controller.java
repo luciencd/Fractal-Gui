@@ -43,15 +43,13 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
         
         VIEW.drawPanel.setWidth(width);
         VIEW.drawPanel.setHeight(height);
+        VIEW.drawPanel.setResolution(baseRes);
         
         
-        MODEL.updateImage();
-		VIEW.setImage(MODEL.getImage());
-
-		VIEW.getDrawPanel().repaint();
-		VIEW.getDrawPanel().revalidate();//This resets it all after all elements have been generated.
-        
-		//VIEW.addActionListener();
+        updateModel();
+		sendViewModel();
+		resetViewPanel();
+		//This resets it all after all elements have been generated.
 
     }
 	
@@ -85,17 +83,28 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		return VIEW;
 	}
 	
-	//Need to make sure this gets called only when the model actually changed.
 	public void updateModel(){
-		MODEL.updateImage();
-	}
-	public void resetViewPanel(){
 		
-		BufferedImage b = MODEL.getImage();
-		VIEW.setImage(b);
-		//Reseting View.
+		MODEL.updateModel();
+		System.out.println("updated model");
+	}
+	//Need to make sure this gets called only when the model actually changed.
+	public void sendViewModel(){
+		FractalStore m = MODEL.getModel();
+		System.out.print("new model points here:");
+		m.print();
+		VIEW.getDrawPanel().setPoints(m);
+		
+		VIEW.repaint();
+		VIEW.revalidate();
+		System.out.println("sent view model");
+	}
+	
+	
+	public void resetViewPanel(){
 		VIEW.getDrawPanel().repaint();
 		VIEW.getDrawPanel().revalidate();
+		System.out.println("reset view panel");
 	}
 	
 	@Override
@@ -116,8 +125,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			MODEL.setY2(coords[3]);
 			
 			//Setting View.
-			updateModel();
-			resetViewPanel();
+			
 			
 		}else if(e.getActionCommand().equals("zoom")){
 			double newX1 = MODEL.getX1();
@@ -140,37 +148,37 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			MODEL.setX2(newX2);
 			MODEL.setY1(newY1);
 			MODEL.setY2(newY2);
+			
+
 			//Setting view
-			updateModel();
-			resetViewPanel();
 			
 		}else if(e.getActionCommand().equals("resolution")){
-			int baseRes = VIEW.toolsPanel.getResolution();
-			System.out.println("resolution");
+			baseRes = VIEW.toolsPanel.getResolution();
+			System.out.println("resolution "+baseRes);
 			pixelize(baseRes);
 			//System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
-			updateModel();
-			resetViewPanel();
+
 			System.out.println("resoluted");
+
 		}else if(e.getActionCommand().equals("save")){
-			int baseRes = VIEW.toolsPanel.getResolution();
+			int prevRes = baseRes;
+			System.out.println(VIEW.drawPanel.image.getHeight());
+			int saveRes = VIEW.toolsPanel.getResolution();
 			
-			int prevWidth = MODEL.getWidth();
-			int prevHeight = MODEL.getHeight();
+			pixelize(saveRes);
+			updateModel();
+			sendViewModel();
+			save(saveRes);
 			
-			MODEL.setWidth(baseRes);
-			MODEL.setHeight(baseRes);
-			MODEL.setResolution(baseRes);
-			System.out.println("Update image:");
-			MODEL.updateImage();
-			save();
-			System.out.println("Updated image.");
-			MODEL.setResolution(prevWidth);
-			MODEL.setWidth(prevWidth);
-			MODEL.setHeight(prevHeight);
-			
+			pixelize(prevRes);
+			System.out.println(VIEW.drawPanel.image.getHeight());
+
 		}
-		
+		System.out.println(VIEW.drawPanel.image.getHeight());
+		updateModel();
+		sendViewModel();
+		resetViewPanel();
+		System.out.println(VIEW.drawPanel.image.getHeight());
 	}
 	
 	//Not sure about this coupling.
@@ -181,23 +189,25 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
     	
     	double heightDouble = MODEL.getY2()-MODEL.getY1();
     	
-    	double widthFraction = (double)x_mov/MODEL.getWidth();
-    	double heightFraction = (double)y_mov/MODEL.getHeight();
+    	double widthFraction = (double)x_mov/VIEW.getWidth();
+    	double heightFraction = (double)y_mov/VIEW.getHeight();
+    	
+    	System.out.println(widthDouble+" "+ heightDouble+ " -> "+widthFraction+ " "+heightFraction);
+    	MODEL.print();
     	MODEL.setX1(widthDouble*(widthFraction)+MODEL.getX1());
     	MODEL.setX2(widthDouble*(widthFraction)+MODEL.getX2());
     	MODEL.setY1(heightDouble*(heightFraction)+MODEL.getY1());
     	MODEL.setY2(heightDouble*(heightFraction)+MODEL.getY2());
-
+    	MODEL.print();
 	}
 	
 	//Makes generating the fractal faster.
 	public void defaultPixels(){
-		pixelize(width);
-		
+		pixelize(baseRes);
 	}
 	public void pixelize(int resolution){
-		baseRes = resolution;
 		MODEL.setResolution(resolution);
+		VIEW.getDrawPanel().setResolution(resolution);
 	}
 
 	@Override 
@@ -213,11 +223,11 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		pan(-posX,-posY);
 		Previousx = currentMX;
 		Previousy = currentMY;
-		resetViewPanel();
+		
 		updateModel();
+		sendViewModel();
+		resetViewPanel();
 		//Now that we changed(panned) we should probably reset image.
-		
-		
 	}
 	
 	@Override
@@ -230,23 +240,24 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
+		pixelize(50);
 		Previousx = e.getX();
 		Previousy = e.getY();
 		//System.out.println("pressed");
-		pixelize(50);
+		
 		
 	}
 
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		//System.out.println("released.");
-		defaultPixels();
-		updateModel();
-		resetViewPanel();
+		pixelize(baseRes);
 		
-		//MODEL.print();
+		updateModel();
+		sendViewModel();
+		resetViewPanel();
+
 	}
 
 
@@ -280,13 +291,10 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 		
 		MODEL.print();*/
 		//System.out.println("ACTUAL POS: ("+(real_x)+","+(real_y)+")");
-		ArrayList<Coordinate<Double>> history = MODEL.listCoordinates(z0,255);
-		for(Coordinate<Double> item : history){
-			//System.out.println("co: "+item.x+" "+item.y);
-			item.x = MODEL.realToWindowX(item.x);
-			item.y = MODEL.realToWindowY(item.y);
-			//System.out.println("af:"+item.x+" "+item.y);
-		}
+		ArrayList<Coordinate<Double,Double>> history = MODEL.listCoordinates(z0,30);
+		
+		
+		//Updating the view here. only the 
 		VIEW.getDrawPanel().historyVisible = true;
 		VIEW.getDrawPanel().setHistory(history);
 		
@@ -304,11 +312,12 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 	}
 	
 	
-	public void save(){
-		System.out.println(baseRes);
+	public void save(int resolution){
 		
-		BufferedImage bi = MODEL.getImage();
+		
+		BufferedImage bi = VIEW.getDrawPanel().createImageSpec(resolution,resolution,resolution);
 		//Add location to save name too. or inside the actual data of the file.
+		
 		String saveName = Double.toString(new Random().nextDouble());
 		
 	    File outputfile = new File(System.getProperty("user.home")+File.separator+"Documents"+"/fractals/"+saveName+".png");

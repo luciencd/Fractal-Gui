@@ -31,12 +31,13 @@ interface Model {
 	abstract int getWidth();
 	abstract int getHeight();
 	
-	abstract void updateImage();
-	abstract BufferedImage getImage();
+	abstract void updateModel();
+	abstract FractalStore getModel();
+	//abstract BufferedImage getImage();
 	
 	abstract void print();
 	
-	abstract ArrayList<Coordinate<Double>> listCoordinates(ComplexNumber z0,int max);
+	abstract ArrayList<Coordinate<Double,Double>> listCoordinates(ComplexNumber z0,int max);
 	abstract void addChangeListener(Controller controller);
 	
 
