@@ -73,8 +73,8 @@ public class DrawPanel extends JPanel
     	Graphics g = img.getGraphics();
     	
     	Color CLOSE = new Color(255, 0,0);//RED
-    	Color MEDIUM = new Color(0,255,0);
-    	Color FAR = new Color(0, 0, 255);//GOLD
+    	Color MEDIUM = new Color(255,255,0);//Yellow
+    	Color FAR = new Color(0, 255, 0);//Green
     	
     	for(Coordinate<Double,Double> item : fractal.getPoints()){
     		Double x = item.x;
@@ -82,8 +82,8 @@ public class DrawPanel extends JPanel
     		int i = (int)((x-x1)/(x2-x1)*(double)(width));//Converting from coordinate in plane to bufferedimage
     		int j = (int)((y-y1)/(y2-y1)*(double)(height));//Converting from coordinate in plane to bufferedimage
     		double iterations = item.getValue();
-    		//Color color = doubleColorIterated(iterations,20,CLOSE,FAR);
-    		Color color = tripleColorIterated(iterations,40,CLOSE,MEDIUM,FAR);
+    		Color color = doubleColorIterated(iterations,20,CLOSE,FAR);
+    		//Color color = tripleColorIterated(iterations,40,CLOSE,MEDIUM,FAR);
     		g.setColor(color);
     		//g.drawLine(i, j, i, j);
     		int w = width/resolution;
@@ -97,7 +97,7 @@ public class DrawPanel extends JPanel
     @Override
     public void paintComponent(Graphics g)
     {
-    	System.out.println("paintComponent drawPanel width: "+width+" height "+height);
+    	//System.out.println("paintComponent drawPanel width: "+width+" height "+height);
     	//fractal.print();
     	BufferedImage img = createImage();
     	image = img;
@@ -114,7 +114,7 @@ public class DrawPanel extends JPanel
         if(history.size()>0){
         	
 	        Coordinate<Double,Double> past = history.get(0);
-	        System.out.println(past.x+" "+past.y);
+	        ///System.out.println(past.x+" "+past.y);
 	        int pastx = (int)((past.x-x1)/(x2-x1)*(double)(width));//Converting from coordinate in plane to bufferedimage
     		int pasty = (int)((past.y-y1)/(y2-y1)*(double)(height));//Converting from coordinate in plane to bufferedimage
 	    	if(historyVisible){

@@ -163,6 +163,11 @@ public class FractalDisplayModel implements Model, ChangeListener{
 		ArrayList<Coordinate<Double,Double>> values = new ArrayList<Coordinate<Double,Double>>();
 		
 		System.out.println("start IMAGE");
+		long startTime = System.nanoTime();
+		
+		
+
+		
 		for(double i = x1; i<x2; i+=stepx){
 			//if(((i-x1)/stepx) == 0){System.out.println((i-x1)/stepx);}
 			for(double j = y1; j<y2;j+=stepy){
@@ -174,8 +179,11 @@ public class FractalDisplayModel implements Model, ChangeListener{
 			}	
 		}
 		
-		FractalStore f = new FractalStore(x1,y1,x2,y2,resolution,values);
-		fractal = f;
+		fractal = new FractalStore(x1,y1,x2,y2,resolution,values);
+		
+		long endTime = System.nanoTime();
+		double duration = (endTime - startTime)/1000000000.0;
+		System.out.println("Fractal generation: "+duration+"seconds elapsed");
 	}
 
 

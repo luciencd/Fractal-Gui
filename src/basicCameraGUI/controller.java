@@ -154,7 +154,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			
 		}else if(e.getActionCommand().equals("resolution")){
 			baseRes = VIEW.toolsPanel.getResolution();
-			System.out.println("resolution "+baseRes);
+			//System.out.println("resolution "+baseRes);
 			pixelize(baseRes);
 			//System.out.println("resolution: "+VIEW.toolsPanel.getResolution());
 
@@ -162,7 +162,7 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 
 		}else if(e.getActionCommand().equals("save")){
 			int prevRes = baseRes;
-			System.out.println(VIEW.drawPanel.image.getHeight());
+			//System.out.println(VIEW.drawPanel.image.getHeight());
 			int saveRes = VIEW.toolsPanel.getResolution();
 			
 			pixelize(saveRes);
@@ -171,14 +171,14 @@ public class Controller extends JComponent implements ChangeListener,ActionListe
 			save(saveRes);
 			
 			pixelize(prevRes);
-			System.out.println(VIEW.drawPanel.image.getHeight());
+			//System.out.println(VIEW.drawPanel.image.getHeight());
 
 		}
-		System.out.println(VIEW.drawPanel.image.getHeight());
+		//System.out.println(VIEW.drawPanel.image.getHeight());
 		updateModel();
 		sendViewModel();
 		resetViewPanel();
-		System.out.println(VIEW.drawPanel.image.getHeight());
+		//System.out.println(VIEW.drawPanel.image.getHeight());
 	}
 	
 	//Not sure about this coupling.

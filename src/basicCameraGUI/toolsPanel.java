@@ -62,10 +62,10 @@ public class toolsPanel extends JPanel
         zoomButton = new JButton("zoom");
         resolutionButton = new JButton("resolution");
         saveButton = new JButton("save");
-        this.add(x1);
+        /*this.add(x1);
         this.add(x2);
         this.add(y1);
-        this.add(y2);
+        this.add(y2);*/
         
         this.add(colorButton);
         this.add(zoomButton);
